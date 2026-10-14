@@ -1,0 +1,115 @@
+[
+  {
+    "id": "document",
+    "version": "1.0",
+    "clock": {
+      "interval": "2026-10-14T12:00:00Z/2026-10-14T12:02:00Z",
+      "currentTime": "2026-10-14T12:00:00Z",
+      "multiplier": 1,
+      "range": "LOOP_STOP",
+      "step": "SYSTEM_CLOCK_MULTIPLIER"
+    }
+  },
+  {
+    "id": "car_sw_1",
+    "availability": "2026-10-14T12:00:00Z/2026-10-14T12:02:00Z",
+    "model": { "gltf": "/models/car.glb", "scale": 2.2, "minimumPixelSize": 48, "heightReference": "CLAMP_TO_GROUND" },
+    "orientation": { "velocityReference": "#position" },
+    "position": {
+      "interpolationAlgorithm": "LINEAR", "interpolationDegree": 1, "epoch": "2026-10-14T12:00:00Z",
+      "cartographicDegrees": [
+        0,   -122.39352, 37.79515, 0,
+        15,  -122.39564, 37.79373, 0,
+        30,  -122.39766, 37.79237, 0,
+        45,  -122.39958, 37.79108, 0,
+        60,  -122.40150, 37.78978, 0,
+        75,  -122.40348, 37.78844, 0
+      ]
+    }
+  },
+  {
+    "id": "car_sw_2",
+    "availability": "2026-10-14T12:00:00Z/2026-10-14T12:02:00Z",
+    "model": { "gltf": "/models/car.glb", "scale": 2.2, "minimumPixelSize": 48, "heightReference": "CLAMP_TO_GROUND" },
+    "orientation": { "velocityReference": "#position" },
+    "position": {
+      "interpolationAlgorithm": "LINEAR", "interpolationDegree": 1, "epoch": "2026-10-14T12:00:00Z",
+      "cartographicDegrees": [
+        12,  -122.39352, 37.79515, 0,
+        27,  -122.39564, 37.79373, 0,
+        42,  -122.39766, 37.79237, 0,
+        57,  -122.39958, 37.79108, 0,
+        72,  -122.40150, 37.78978, 0,
+        87,  -122.40348, 37.78844, 0
+      ]
+    }
+  },
+  {
+    "id": "car_sw_3",
+    "availability": "2026-10-14T12:00:00Z/2026-10-14T12:02:00Z",
+    "model": { "gltf": "/models/car.glb", "scale": 2.2, "minimumPixelSize": 48, "heightReference": "CLAMP_TO_GROUND" },
+    "orientation": { "velocityReference": "#position" },
+    "position": {
+      "interpolationAlgorithm": "LINEAR", "interpolationDegree": 1, "epoch": "2026-10-14T12:00:00Z",
+      "cartographicDegrees": [
+        24,  -122.39352, 37.79515, 0,
+        39,  -122.39564, 37.79373, 0,
+        54,  -122.39766, 37.79237, 0,
+        69,  -122.39958, 37.79108, 0,
+        84,  -122.40150, 37.78978, 0,
+        99,  -122.40348, 37.78844, 0
+      ]
+    }
+  },
+  {
+    "id": "car_ne_1",
+    "availability": "2026-10-14T12:00:00Z/2026-10-14T12:02:00Z",
+    "model": { "gltf": "/models/car.glb", "scale": 2.2, "minimumPixelSize": 48, "heightReference": "CLAMP_TO_GROUND" },
+    "orientation": { "velocityReference": "#position" },
+    "position": {
+      "interpolationAlgorithm": "LINEAR", "interpolationDegree": 1, "epoch": "2026-10-14T12:00:00Z",
+      "cartographicDegrees": [
+        0,   -122.40348, 37.78844, 0,
+        15,  -122.40150, 37.78978, 0,
+        30,  -122.39958, 37.79108, 0,
+        45,  -122.39766, 37.79237, 0,
+        60,  -122.39564, 37.79373, 0,
+        75,  -122.39352, 37.79515, 0
+      ]
+    }
+  },
+  {
+    "id": "car_ne_2",
+    "availability": "2026-10-14T12:00:00Z/2026-10-14T12:02:00Z",
+    "model": { "gltf": "/models/car.glb", "scale": 2.2, "minimumPixelSize": 48, "heightReference": "CLAMP_TO_GROUND" },
+    "orientation": { "velocityReference": "#position" },
+    "position": {
+      "interpolationAlgorithm": "LINEAR", "interpolationDegree": 1, "epoch": "2026-10-14T12:00:00Z",
+      "cartographicDegrees": [
+        15,  -122.40348, 37.78844, 0,
+        30,  -122.40150, 37.78978, 0,
+        45,  -122.39958, 37.79108, 0,
+        60,  -122.39766, 37.79237, 0,
+        75,  -122.39564, 37.79373, 0,
+        90,  -122.39352, 37.79515, 0
+      ]
+    }
+  },
+  {
+    "id": "car_ne_3",
+    "availability": "2026-10-14T12:00:00Z/2026-10-14T12:02:00Z",
+    "model": { "gltf": "/models/car.glb", "scale": 2.2, "minimumPixelSize": 48, "heightReference": "CLAMP_TO_GROUND" },
+    "orientation": { "velocityReference": "#position" },
+    "position": {
+      "interpolationAlgorithm": "LINEAR", "interpolationDegree": 1, "epoch": "2026-10-14T12:00:00Z",
+      "cartographicDegrees": [
+        30,  -122.40348, 37.78844, 0,
+        45,  -122.40150, 37.78978, 0,
+        60,  -122.39958, 37.79108, 0,
+        75,  -122.39766, 37.79237, 0,
+        90,  -122.39564, 37.79373, 0,
+        105, -122.39352, 37.79515, 0
+      ]
+    }
+  }
+]
