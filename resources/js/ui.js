@@ -10,6 +10,14 @@ export function spark(cv, arr, color, minSpan = 10) {
   c.lineTo(w - 5, h); c.lineTo(1, h); c.closePath(); c.globalAlpha = .16; c.fillStyle = color; c.fill(); c.globalAlpha = 1;
   const [ex, ey] = pt(arr.length - 1); c.beginPath(); c.arc(ex, ey, 3.2, 0, 6.3); c.fillStyle = color; c.fill();
 }
+const ATK_NAMES = { P1: 'Edited after signing', P2: 'Cloned sensor, wrong place', P3: 'Unregistered identity', P4: 'Replayed message', P5: 'Wrong segment id', P6: 'Stolen key (known limit)' };
+/** Attack lab + verification statistics. d: { acc, rej, genuine, genuineRej, vms (ms or null), atk: { P1: { sent, det } ... }, target, thr } */
+export function setCrypto(d) {
+  put('#cAcc', String(d.acc)); put('#cRej', String(d.rej)); put('#cFpr', d.genuine ? `${d.genuineRej} of ${d.genuine} (${(d.genuineRej / d.genuine * 100).toFixed(1)}%)` : '–');
+  put('#cVms', d.vms === null ? 'on server' : `${d.vms.toFixed(2)} ms`); put('#cTarget', d.target); put('#thrv', `${d.thr} m`);
+  for (const p of Object.keys(ATK_NAMES)) { const a = d.atk[p], e = $('#cr' + p); if (!a.sent) { put('#cr' + p, '–'); continue; }
+    const txt = p === 'P6' ? `${a.sent - a.det} of ${a.sent} passed` : `${a.det} of ${a.sent} caught`; put('#cr' + p, txt); const c = (p === 'P6' ? a.det === 0 : a.det === a.sent) ? 'r good' : 'r miss'; if (e._c !== c) { e._c = c; e.className = c; } }
+}
 const put = (id, t) => { const e = $(id); if (e._t !== t) { e._t = t; e.textContent = t; } };   // write to the DOM only when the text changed
 const pill = (id, t, cls) => { const e = $(id); put(id, t); if (e._c !== cls) { e._c = cls; e.className = 'pill ' + cls; } };
 /** Footer indicators: one place formats everything (also used for the visual test). */
@@ -28,6 +36,7 @@ const ICON = {
   weather: I('<path d="M7 17a4 4 0 0 1-.6-8A6 6 0 0 1 18 9a4.2 4.2 0 0 1-.5 8H7Z"/><path d="m9 20 1-2m4 2 1-2"/>'),
   traffic: I('<path d="M4 16h16M6 16l1.6-6h8.8L18 16M7.5 16v2.5M16.5 16v2.5"/>'),
   events: I('<path d="M6 17v-6a6 6 0 1 1 12 0v6l2 2H4l2-2Z"/><path d="M10 21h4"/>'),
+  crypto: I('<path d="M12 3 5 6v6c0 4.5 3 7.5 7 9 4-1.5 7-4.5 7-9V6l-7-3Z"/><path d="m9 12 2 2 4-4"/>'),
   system: I('<circle cx="12" cy="12" r="3"/><path d="M12 3v3m0 12v3M3 12h3m12 0h3M5.6 5.6l2.1 2.1m8.6 8.6 2.1 2.1m0-12.8-2.1 2.1M7.7 16.3l-2.1 2.1"/>'),
 };
 const sw = (id, label, on) => `<label class="sw"><input type="checkbox" id="${id}"${on ? ' checked' : ''}><i></i><span>${label}</span></label>`;
@@ -75,6 +84,8 @@ input[type=range]{width:100%;accent-color:var(--acc);margin:2px 0 6px}
 .tile{display:flex;flex-direction:column;gap:3px;min-width:0;padding:9px 13px 8px;border-radius:11px;background:rgba(255,255,255,.07)}
 .tile small{font-size:12px;color:#aab8c8}.tile b{font-size:27px;line-height:1.05;font-weight:700;font-variant-numeric:tabular-nums;color:#fff;white-space:nowrap}
 .tile>span{font-size:12px;color:#aab8c8;min-height:20px;display:flex;align-items:center;gap:6px;flex-wrap:wrap}.tile canvas{display:block;width:100%;height:34px;margin-top:2px}
+.cg{display:grid;grid-template-columns:1fr 1fr;gap:6px}.cg>div{background:var(--bg2);border-radius:10px;padding:8px 10px}.cg small{display:block;color:var(--mut);font-size:11.5px}.cg b{font-size:18px;font-variant-numeric:tabular-nums}
+.atk{width:100%;border-collapse:collapse;font-size:12.5px}.atk td{padding:5px 4px;border-top:1px solid var(--line);vertical-align:middle}.atk td:first-child b{color:var(--acc)}.atk button{padding:3px 9px}.atk .r{text-align:right;color:var(--mut);font-variant-numeric:tabular-nums;white-space:nowrap}.atk .r.good{color:var(--ok)}.atk .r.miss{color:var(--warn)}
 .pill{font-style:normal;font-size:11.5px;font-weight:650;padding:2px 9px;border-radius:99px;background:rgba(255,255,255,.12);color:#dbe5f0}
 .pill.ok{background:rgba(74,222,128,.18);color:var(--ok)}.pill.warn{background:rgba(255,176,32,.2);color:var(--warn)}.pill.bad{background:rgba(255,93,108,.22);color:#ff8a96}
 #kpiToggle{align-self:flex-start;padding:4px 9px}
@@ -87,7 +98,7 @@ export function mountUI() {
   document.querySelector('#hud')?.remove();
   if (!document.getElementById('cesium')) document.body.insertAdjacentHTML('afterbegin', '<div id="cesium"></div>');
   document.head.insertAdjacentHTML('beforeend', `<style>${CSS}</style>`);
-  const rail = ['layers', 'weather', 'traffic', 'events', 'system'].map(t => `<button data-tab="${t}" title="${t[0].toUpperCase() + t.slice(1)}" aria-label="${t}">${ICON[t]}${t === 'events' ? '<span class="bd" id="bd" hidden></span>' : ''}</button>`).join('');
+  const rail = ['layers', 'weather', 'traffic', 'crypto', 'events', 'system'].map(t => `<button data-tab="${t}" title="${t[0].toUpperCase() + t.slice(1)}" aria-label="${t}">${ICON[t]}${t === 'events' ? '<span class="bd" id="bd" hidden></span>' : ''}</button>`).join('');
   document.body.insertAdjacentHTML('beforeend', `<div id="ui">
 <div id="top"><div class="brand glass"><span class="logo"></span><b>Road Twin</b><small>ITS road network</small></div>
  <span class="chip" id="srcChip">starting…</span><span class="chip" id="spdChip">1×</span><span class="chip" id="fpsChip">– fps</span><span class="chip" id="clockChip">12:00</span></div>
@@ -102,7 +113,7 @@ export function mountUI() {
   <div class="row"><span><i class="dot" style="background:#ffb020"></i>Motorbikes</span>${sw('fBike', '', true)}</div>
   <div class="row"><span><i class="dot" style="background:#2d9cff"></i>Cars</span>${sw('fCar', '', true)}</div>
   <div class="row"><span><i class="dot" style="background:#ff5a5f"></i>Buses</span>${sw('fBus', '', true)}</div>
-  <h3>Scale</h3><label class="row"><span>Vehicle size</span></label><input id="size" type="range" min="1" max="10" value="4">
+  <h3>Scale</h3><label class="row"><span>Vehicle enlargement (real size when close)</span></label><input id="size" type="range" min="1" max="10" value="4">
   <label class="row"><span>Model facing</span></label><div class="seg"><button data-face="0" class="on">0°</button><button data-face="90">90°</button><button data-face="180">180°</button><button data-face="270">270°</button></div>
   <p class="mut small">If vehicles drive backwards or sideways, change this.</p>
   <label class="row"><span>Building height offset</span><b id="boffv">0 m</b></label><input id="boff" type="range" min="-80" max="80" value="0"></section>
@@ -115,6 +126,14 @@ export function mountUI() {
  <section data-sec="traffic" hidden><h3>Volume</h3><label class="row"><span>Vehicles</span><b id="nvehv">300</b></label><input id="nveh" type="range" min="50" max="1000" step="50" value="300">
   <h3>Simulation speed</h3><div class="seg"><button data-spd="0">Pause</button><button data-spd="0.5">0.5×</button><button data-spd="1" class="on">1×</button><button data-spd="2">2×</button><button data-spd="4">4×</button><button data-spd="8">8×</button></div>
   <p class="mut small">Signals, parking times and bus stops run on simulated time, so they speed up with it.</p><h3>Right now</h3><div id="tfacts" class="small"></div></section>
+ <section data-sec="crypto" hidden><h3>Verification at ingest</h3>
+  <p class="mut small">Every sensor message is signed. Before a reading reaches the map the server checks identity, signature, sequence, location and road segment.</p>
+  <div class="cg"><div><small>Accepted</small><b id="cAcc">0</b></div><div><small>Rejected</small><b id="cRej">0</b></div><div><small>Genuine wrongly rejected</small><b id="cFpr">–</b></div><div><small>Verify time per message</small><b id="cVms">–</b></div></div>
+  <h3>Attack lab</h3><p class="small mut" style="margin:0 0 6px">Target sensor: <b id="cTarget" style="color:var(--ink)">N-001</b>. Click a sensor pole on the map to change it.</p>
+  <table class="atk"><tbody id="catk"></tbody></table>
+  <h3>Location threshold</h3><label class="row"><span>Max distance from registered position</span><b id="thrv">25 m</b></label><input id="thr" type="range" min="5" max="60" value="25">
+  <p class="mut small">Tight limits reject real GPS noise; loose limits let nearby clones through. P6 passes by design: a stolen key used from the correct place cannot be told apart by this check.</p>
+  <p class="mut small">Forged readings are drawn on the map for 10 s: a red dot where the message claims to be, joined to the sensor's registered position.</p></section>
  <section data-sec="events" hidden><h3>Event feed</h3><div class="acts" style="margin:0"><button id="evClear">Clear</button><button id="evCsv">Export CSV</button></div><ul id="events"></ul></section>
  <section data-sec="system" hidden><h3>Quality</h3><div class="seg"><button data-q="auto" class="on">Auto</button><button data-q="eco">Eco</button><button data-q="low">Low</button><button data-q="medium">Medium</button><button data-q="high">High</button></div>
   <p id="perf" class="mut small">–</p><h3>Latency, server to render</h3><div class="row"><span>p50</span><b id="p50">–</b></div><div class="row"><span>p95</span><b id="p95">–</b></div>
@@ -139,6 +158,7 @@ export function mountUI() {
     document.dispatchEvent(new CustomEvent('twin:tab', { detail: tab }));
   });
   document.querySelectorAll('#ui .seg').forEach(g => g.addEventListener('click', e => { const b = e.target.closest('button'); if (b) { g.querySelectorAll('button').forEach(x => x.classList.toggle('on', x === b)); } }));
+  $('#catk').innerHTML = Object.entries(ATK_NAMES).map(([p, n]) => `<tr><td><b>${p}</b> ${n}</td><td class="r" id="cr${p}">–</td><td><button data-atk="${p}">Inject</button></td></tr>`).join('');
   const kpi = $('#kpi'), setFoot = () => document.documentElement.style.setProperty('--foot', (kpi.offsetHeight + 12) + 'px');   // panels and attribution stay above the footer
   let compact = innerWidth < 560; try { const k = localStorage.getItem('twin.kpi'); if (k) compact = k === 'compact'; } catch (e) { /* private mode */ }   // phones start compact
   const applyCompact = () => { kpi.classList.toggle('compact', compact); $('#kpiToggle').textContent = compact ? '▴' : '▾'; setFoot(); };
